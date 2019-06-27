@@ -3,7 +3,7 @@ central-sandbox.sqldb
 campaign-sandbox.sqldb
 fraud-sandbox.sqldb
 invoicing-sandbox.sqldb
-
+au-sandbox.sqldb
 eu-sandbox.sqldb
 gb-sandbox.sqldb
 na-sandbox.sqldb
