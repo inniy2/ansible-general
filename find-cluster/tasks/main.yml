@@ -1,0 +1,36 @@
+---
+- name: Find clusters by database
+  vars:
+    OPT_DATABASE_NAME: "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+  shell: "ls -ald /mysql/data/{{ OPT_DATABASE_NAME }}"
+  register: out_clusters_by_database
+  tags: pro
+
+- debug: var=out_clusters_by_database.stdout_lines
+  tags: pro
+
+
+
+- name: Find clusters by table
+  vars:
+    OPT_DATABASE_NAME: "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+    OPT_TABLE_NAME:    "{{lookup('env', 'OPT_TABLE_NAME')}}"
+  shell: "ls -al /mysql/data/{{ OPT_DATABASE_NAME }}/{{ OPT_TABLE_NAME }}.ibd"
+  register: out_clusters_by_table
+  tags: pro
+
+- debug: var=out_clusters_by_table.stdout_lines
+  tags: pro
+
+
+
+- name: Find clusters by table (Size)
+  vars:
+    OPT_DATABASE_NAME: "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+    OPT_TABLE_NAME:    "{{lookup('env', 'OPT_TABLE_NAME')}}"
+  shell: "du -sh  /mysql/data/{{ OPT_DATABASE_NAME }}/{{ OPT_TABLE_NAME }}.ibd"
+  register: out_table_size
+  tags: pro
+
+- debug: var=out_table_size.stdout_lines
+  tags: pro

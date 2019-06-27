@@ -1,0 +1,38 @@
+---
+
+- name: Check gh-ost version
+  shell: gh-ost --version
+  register: out_ghost
+  tags: pro
+
+- debug: var=out_ghost.stdout_lines
+  tags: pro
+
+- name: Create directories ( operationlog )
+  vars:
+    OPT_HOME: "{{lookup('env', 'OPT_HOME')}}"
+  file:
+    path: "{{ OPT_HOME }}/operationlog"
+    state: directory
+    mode: '0775'
+    owner: root
+    group: root
+  tags: pro
+
+- name: Create gh-ost dry run script
+  vars:
+    OPT_DATABASE_NAME: "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+    OPT_TABLE_NAME:    "{{lookup('env', 'OPT_TABLE_NAME')}}"
+    OPT_REPLICAS:      "{{lookup('env', 'OPT_REPLICAS')}}"
+    OPT_HOME:          "{{lookup('env', 'OPT_HOME')}}"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ OPT_HOME }}/operationlog/{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: root
+    group: root
+  with_items:
+    - { src: 'alter.sql.j2',     mode: '0644', dest: 'alter.sql' }
+    - { src: 'dry_alter.sh.j2',  mode: '0755', dest: 'dry_alter.sh' }
+    - { src: 'run_alter.sh.j2',  mode: '0755', dest: 'run_alter.sh' }
+  tags: pro

@@ -1,0 +1,18 @@
+---
+
+- name: create drop-table.sql file
+  vars:
+    OPT_DATABASE_NAME:  "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+    OPT_TABLE_NAME:     "{{lookup('env', 'OPT_TABLE_NAME')}}"
+  template:
+    src: "{{ item.src }}"
+    dest: "/tmp/{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: root
+    group: root
+  with_items:
+    - { src: 'drop-table.sql.j2',     mode: '0644', dest: 'drop-table.sql' }
+  tags: pro
+
+
+

@@ -1,0 +1,44 @@
+---
+
+- name: Create hardlinks
+  vars:
+    OPT_MYSQL_DATA_DIR: "{{lookup('env', 'OPT_MYSQL_DATA_DIR')}}"
+    OPT_DATABASE_NAME:  "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+    OPT_TABLE_NAME:     "{{lookup('env', 'OPT_TABLE_NAME')}}"
+  file:
+    src:  "{{ OPT_MYSQL_DATA_DIR }}/{{ OPT_DATABASE_NAME }}/{{ OPT_TABLE_NAME }}.ibd"
+    path: "{{ OPT_MYSQL_DATA_DIR }}/{{ OPT_DATABASE_NAME }}/{{ OPT_TABLE_NAME }}.ibd.rm"
+    state: hard
+  tags: pro
+
+
+- name: Create directories ( python-truncate )
+  vars:
+    OPT_HOME: "{{lookup('env', 'OPT_HOME')}}"
+  file:
+    path: "{{ OPT_HOME }}/python-truncate"
+    state: directory
+    mode: '0775'
+    owner: root
+    group: root
+  tags: pro
+
+- name: python-truncate script
+  vars:
+    OPT_MYSQL_DATA_DIR: "{{lookup('env', 'OPT_MYSQL_DATA_DIR')}}"
+    OPT_DATABASE_NAME:  "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+    OPT_TABLE_NAME:     "{{lookup('env', 'OPT_TABLE_NAME')}}"
+    OPT_IDLE_INTERVAL:  "{{lookup('env', 'OPT_IDLE_INTERVAL')}}"
+    OPT_HOME:           "{{lookup('env', 'OPT_HOME')}}"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ OPT_HOME }}/python-truncate/{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: root
+    group: root
+  with_items:
+    - { src: 'python-truncate.j2',     mode: '0755', dest: 'python-truncate' }
+  tags: pro
+
+
+

@@ -1,0 +1,16 @@
+---
+
+- hosts: "{{ OPT_HOSTS | default('undefined') }}"
+  become: yes
+  become_method: sudo
+
+  roles:
+    - create-hardlink
+
+
+- hosts: master
+  become: yes
+  become_method: sudo
+
+  roles:
+    - create-drop-table-sql

@@ -1,0 +1,93 @@
+#!/usr/bin/python
+
+import sys
+import os
+import subprocess
+import time
+# import configparser
+
+
+# config = configparser.ConfigParser()
+# config.read('pytruncate.conf')
+
+# mysql_dir=config['DEFAULT']['mysql_dir']
+# schema=config['DEFAULT']['schema']
+# definition=config['DEFAULT']['definition']
+# truncate_size=int(config['DEFAULT']['truncate_size'])
+# idle_interval=int(config['DEFAULT']['idle_interval'])
+
+mysql_dir="{{ OPT_MYSQL_DATA_DIR }}"
+schema="{{ OPT_DATABASE_NAME }}"
+definition="{{ OPT_TABLE_NAME }}"
+truncate_size=1073741824
+idle_interval={{ OPT_IDLE_INTERVAL }}
+
+
+truncate_commandLine="truncate  -s  -2GB"
+#truncate_commandLine="ls -al"
+delete_commandLine="rm -rf"
+
+
+source_file_path=mysql_dir+"/"+schema+"/"+definition+".ibd"
+target_file_path=mysql_dir+"/"+schema+"/"+definition+".ibd.rm"
+
+
+# ###################################################
+# Validation
+# ###################################################
+
+if truncate_size != 1073741824:
+    print("Please use truncate_size 1073741824 bytes for now. I will improve in the future.")
+    print("Program exit")
+    exit(103)
+
+
+isSourceFileExists= os.path.exists(source_file_path)
+if isSourceFileExists:
+    print("%s is still here"  %(source_file_path))
+    print("Program exit")
+    exit(102)
+
+
+# ###################################################
+# Functions
+# ###################################################
+
+#print(str(sys.version_info[0])+sys.version_info[1]+sys.version_info[2])
+
+def shellCommand(str):
+    bashCommand = str+" "+target_file_path
+    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    print("STD1 : %s" %(output) )
+    print("STD2 :  %s" %(error) )
+
+
+# ###################################################
+# Logic
+# ###################################################
+
+try:
+    print("Target file name: %s" %(target_file_path))
+    total_size = os.path.getsize(target_file_path)
+    loop_cnt= int(total_size / truncate_size)
+    print("Total file size in byte: %d" %(total_size))
+    print("Total iteration count: %d" %(loop_cnt))
+
+    for x in range(loop_cnt+1):
+        shellCommand(truncate_commandLine)
+        print("iteration: %d" %(x))
+        time.sleep(idle_interval)
+
+    reduced_size = os.path.getsize(target_file_path)
+
+    if reduced_size < truncate_size:
+        shellCommand(delete_commandLine)
+        print("%s is deleted." %(target_file_path))
+    else:
+        print("%s is note deleted. Still too big" %(target_file_path))
+
+except Exception as e:
+    print(str(e))
+    print("Program exit")
+    exit(101)

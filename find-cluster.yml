@@ -1,0 +1,9 @@
+---
+
+- hosts: "{{ OPT_HOSTS | default('undefined') }}"
+  become: yes
+  become_method: sudo
+
+  roles:
+    - find-cluster
+

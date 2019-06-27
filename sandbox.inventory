@@ -1,0 +1,16 @@
+[sandboxes]
+central-sandbox.sqldb
+campaign-sandbox.sqldb
+fraud-sandbox.sqldb
+invoicing-sandbox.sqldb
+
+eu-sandbox.sqldb
+gb-sandbox.sqldb
+na-sandbox.sqldb
+ru-sandbox.sqldb
+payment-sandbox.sqldb
+ren-cen-sandbox.sqldb
+ren-glob-sandbox.sqldb
+
+[local]
+10.145.239.63

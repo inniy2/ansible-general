@@ -1,0 +1,66 @@
+---
+
+- name: Check gh-ost version
+  shell: gh-ost --version
+  register: out_ghost
+  tags: pro
+  ignore_errors: yes
+
+- debug: var=out_ghost.stdout_lines
+  tags: pro
+
+- name: Check ths size of the table
+  vars:
+    OPT_MYSQL_DATA_DIR: "{{lookup('env', 'OPT_MYSQL_DATA_DIR')}}"
+    OPT_DATABASE_NAME: "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+    OPT_TABLE_NAME:    "{{lookup('env', 'OPT_TABLE_NAME')}}"
+  shell: "du -sh {{ OPT_MYSQL_DATA_DIR }}/{{ OPT_DATABASE_NAME }}/{{ OPT_TABLE_NAME }}.ibd"
+  register: out_table_size
+  tags: pro
+
+- debug: var=out_table_size.stdout_lines
+  tags: pro
+
+- name: Check ths size of the MySQL mount
+  vars:
+    OPT_MYSQL_DATA_DIR: "{{lookup('env', 'OPT_MYSQL_DATA_DIR')}}"
+  shell: "df -h {{ OPT_MYSQL_DATA_DIR }}"
+  register: out_mysql_mount_size
+  tags: pro
+
+- debug: var=out_mysql_mount_size.stdout_lines
+  tags: pro
+
+- name: Check old table size
+  vars:
+    OPT_MYSQL_DATA_DIR: "{{lookup('env', 'OPT_MYSQL_DATA_DIR')}}"
+  shell: "find {{ OPT_MYSQL_DATA_DIR }} -type f -iname \"_*.ibd\" -exec du -sh {} + | sort -rh"
+  register: out_old_table_size
+  tags: pro
+
+- debug: var=out_old_table_size.stdout_lines
+  tags: pro
+
+- name: Check AS-IS definition
+  vars:
+    OPT_MYSQL_DATA_DIR: "{{lookup('env', 'OPT_MYSQL_DATA_DIR')}}"
+    OPT_DATABASE_NAME: "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+    OPT_TABLE_NAME:    "{{lookup('env', 'OPT_TABLE_NAME')}}"
+  shell: "mysql --defaults-file=/etc/mysql/debian.cnf --table -e\"SHOW CREATE TABLE {{ OPT_DATABASE_NAME }}.{{ OPT_TABLE_NAME }}\\G\""
+  register: out_asis_definition
+  tags: pro
+
+- debug: var=out_asis_definition.stdout_lines
+  tags: pro
+
+- name: Check number of row in the table
+  vars:
+    OPT_MYSQL_DATA_DIR: "{{lookup('env', 'OPT_MYSQL_DATA_DIR')}}"
+    OPT_DATABASE_NAME: "{{lookup('env', 'OPT_DATABASE_NAME')}}"
+    OPT_TABLE_NAME:    "{{lookup('env', 'OPT_TABLE_NAME')}}"
+  shell: "mysql --defaults-file=/etc/mysql/debian.cnf --table -e\"SHOW KEYS FROM {{ OPT_DATABASE_NAME }}.{{ OPT_TABLE_NAME }}\""
+  register: out_cardinality
+  tags: pro
+
+- debug: var=out_cardinality.stdout_lines
+  tags: pro

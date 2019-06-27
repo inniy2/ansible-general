@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# HP https://github.com/github/gh-ost
+# Cheatsheet: https://github.com/github/gh-ost
+# Interactive commands: https://github.com/github/gh-ost/blob/master/doc/interactive-commands.md
+
+DB={{ OPT_DATABASE_NAME }}
+TABLE={{ OPT_TABLE_NAME }}
+ALTER=$(cat alter.sql)
+MONITOR_SLAVES="{{ OPT_REPLICAS }}"
+
+gh-ost \
+--max-load=Threads_running=50 \
+--critical-load=Threads_running=1500 \
+--chunk-size=500 \
+--max-lag-millis=1500 \
+--conf=/etc/mysql/debian.cnf \
+--host=127.0.0.1 \
+--throttle-control-replicas=$MONITOR_SLAVES \
+--database=$DB \
+--table=$TABLE \
+--alter="$ALTER" \
+--switch-to-rbr \
+--cut-over=default \
+--exact-rowcount \
+--concurrent-rowcount \
+--default-retries=120 \
+--timestamp-old-table \
+--panic-flag-file=/tmp/ghost.panic.flag \
+--postpone-cut-over-flag-file=/tmp/ghost.postpone.flag \
+--verbose
