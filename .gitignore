@@ -9,4 +9,6 @@
 
 */[Ll]ogs/*
 *.retry
+
 bae.pw
+prepare/templates/alter.sql.j2

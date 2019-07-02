@@ -1,0 +1,18 @@
+---
+
+- hosts: "{{ OPT_HOSTS | default('undefined') }}"
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - name: Run python-truncate
+      shell: nohup python /home/sangsun/python-truncate/python-truncate > /home/sangsun/python-truncate/truncate.log 2<&1  &
+      tags: pro
+    
+    - name: Check python process
+      shell: ps aux | grep python
+      register: out_catlog
+      tags: pro
+
+    - debug: var=out_catlog.stdout_lines
+      tags: pro
